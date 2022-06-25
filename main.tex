@@ -11,9 +11,6 @@
 \usepackage{graphicx}
 \usepackage{microtype}
 
-% --- Pacotes adicionais
-\usepackage{lipsum}
-
 % --- Pacotes de citações
 \usepackage[brazilian,hyperpageref]{backref}
 \usepackage[alf]{abntex2cite}
@@ -44,15 +41,15 @@
 % --- Informações do PDF
 \makeatletter
 \hypersetup{
-		pdftitle={\@title}, 
-		pdfauthor={\@author},
-    	pdfsubject={Modelo de artigo científico com abnTeX2},
-		colorlinks=true,
-    	linkcolor=blue,
-    	citecolor=blue,
-    	filecolor=magenta,
-		urlcolor=blue,
-		bookmarksdepth=4
+    pdftitle={\@title}, 
+	pdfauthor={\@author},
+    pdfsubject={Modelo de artigo científico com abnTeX2},
+	colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    filecolor=magenta,
+	urlcolor=blue,
+	bookmarksdepth=4
 }
 
 \makeatother
@@ -138,7 +135,7 @@ Um exemplo prático sobre um uso de uma view: abaixo vemos uma view criada para 
     WHERE a.City = 'Seattle'
 \end{verbatim}
 
-Fazendo dessa forma, é possível acessar as informações mais importantes destes funcionários de forma consolidada em uma "tabela virtual" chamada SeattleOnly.
+Fazendo dessa forma, é possível acessar as informações mais importantes destes funcionários de forma consolidada em uma tabela chamada SeattleOnly.
 
 % --- Tópico: Triggers
 \section{Triggers}
@@ -169,21 +166,19 @@ Para exemplificar na prática o uso de triggers, será usado como cenário uma c
 Pelo código abaixo, sempre que forem registradas ou excluídas vendas, essas operações devem ser automaticamente refletidas na tabela de caixa, aumentando ou reduzindo o saldo.
 
 \begin{verbatim}
-CREATE TRIGGER TGR_VENDAS_AI
-ON VENDAS
-FOR INSERT
-AS
-BEGIN
-    DECLARE
-    @VALOR  DECIMAL(10,2),
-    @DATA   DATETIME
-
-    SELECT @DATA = DATA, @VALOR = VALOR FROM INSERTED
-
-    UPDATE CAIXA SET SALDO_FINAL = SALDO_FINAL + @VALOR
-    WHERE DATA = @DATA
-END
-GO
+    CREATE TRIGGER TGR_VENDAS_AI
+    ON VENDAS
+    FOR INSERT
+    AS
+    BEGIN
+        DECLARE
+        @VALOR  DECIMAL(10,2),
+        @DATA   DATETIME
+        SELECT @DATA = DATA, @VALOR = VALOR FROM INSERTED
+        UPDATE CAIXA SET SALDO_FINAL = SALDO_FINAL + @VALOR
+        WHERE DATA = @DATA
+    END
+    GO
 \end{verbatim}
 
 No exemplo acima, o trigger reflete diretamente sobre a tabela de vendas, que reduzirá o saldo final do caixa na data da venda quando uma venda for inserida.
@@ -193,17 +188,48 @@ No exemplo acima, o trigger reflete diretamente sobre a tabela de vendas, que re
 
 \subsection{Definição}
 
+Procedimentos, basicamente são um conjunto de comandos em SQL que podem ser executados de uma única vez (como uma função).
 
 \subsection{Para que serve}
 
+Os procedimentos servem para armazenar tarefas repetitivas e aceitar parâmetros de entrada para que determinada tarefa seja efetuada de acordo com a necessidade individual do usuário.
 
 \subsection{Para que deve ser aplicado}
 
+Os procedimentos ajudam a reduzir o tráfego na rede, melhorar a performance de um banco de dados, criar tarefas agendadas, diminuir riscos, criar rotinas de processamento, entre outras aplicações. \\
+Procedimentos devem podem aplicados quando temos várias aplicações escritas em diferentes linguagens, ou rodam em plataformas diferentes, porém executam a mesma função. \\
 
 \subsection{Locais onde não deve ser aplicado}
 
+Os procedimentos, apesar de ser a opção mais rápida em determinadas situações (quando em comparação com um trigger, por exemplo),
+eles também tiram muito o controle geral do que esta sendo processado pelo sistema, ou seja, isso pode ser uma desvantagem em determinadas situações.
 
 \subsection{Exemplos práticos}
+
+No exemplo abaixo, é executado uma consulta utilizando um filtro por descrição, em uma tabela específica de um determinado banco de dados.
+
+\begin{verbatim}
+    USE BancoDados
+    GO
+    CREATE PROCEDURE Busca
+    @CampoBusca VARCHAR (20)
+    AS
+    SELECT Codigo, Descrição
+    FROM NomeTabela
+    WHERE Descricao = @CampoBusca
+\end{verbatim}
+
+Para executar esse procedimento, basta declarar "EXECUTE" seguido pelo nome dele, e na frente o valor a ser utilizado como parâmetro.
+
+\begin{verbatim}
+    EXECUTE Busca 'Exemplo'
+\end{verbatim}
+
+Para excluir um procedimento, basta utilizar a cláusula "DROP PROCEDURE" como no exemplo abaixo.
+
+\begin{verbatim}
+    DROP PROCEDURE Busca
+\end{verbatim}
 
 % --- Tópico: Joins
 \section{Joins}
@@ -223,10 +249,13 @@ No exemplo acima, o trigger reflete diretamente sobre a tabela de vendas, que re
 \subsection{Exemplos práticos}
 
 
+
+
 % --- Conclusão
 \section{Considerações finais}
 
-\addcontentsline{toc}{section}{Considerações finais}
+Como visto nesse artigo científico, as aplicações de views, triggers, procedimentos e joins são recursos importantes a serem implementados em um banco de dados, pois eles simplificam diversas operações a serem realizadas por ele, \\
+Assim sendo, se torna mais simples a codificação de um determinado sistema, definindo uma camada intermediária de controle entre o usuário, o banco de dados físico e o código fonte da aplicação.
 
 % --- Referências bibliográficas
 \vspace{\onelineskip}
@@ -238,6 +267,8 @@ No exemplo acima, o trigger reflete diretamente sobre a tabela de vendas, que re
 \nocite{microsoft-create-view}
 \nocite{triggers-no-sql}
 \nocite{trigger-trybe}
+\nocite{ibm-procedimentos}
+\nocite{introducao-procedimentos}
 
 % --- Fim do documento
 \bookmarksetup{startatroot}
