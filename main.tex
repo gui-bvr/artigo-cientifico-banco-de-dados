@@ -1,0 +1,245 @@
+% --- Classes do documento
+\documentclass[article,11pt,oneside,a4paper,english,brazil,sumario=tradicional]{abntex2}
+
+% --- Pacotes fundamentais
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{indentfirst}
+\usepackage{nomencl}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{microtype}
+
+% --- Pacotes adicionais
+\usepackage{lipsum}
+
+% --- Pacotes de citações
+\usepackage[brazilian,hyperpageref]{backref}
+\usepackage[alf]{abntex2cite}
+
+% --- Configurações do pacote backref
+\renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
+% Texto padrão antes do número das páginas
+\renewcommand{\backref}{}
+% Define os textos da citação
+\renewcommand*{\backrefalt}[4]{
+    \ifcase #1 %
+         %
+    \or
+        Citado na página #2.%
+    \else
+        Citado #1 vezes nas páginas #2.%
+    \fi}%
+
+% --- Capa e folha de rosto
+\titulo{Artigo científico sobre banco de dados}
+\autor{Guilherme Banzati Viana Ribeiro}
+\local{Brasil}
+\data{24 de Junho de 2022}
+
+% --- Configurações de aparência do PDF final
+\definecolor{blue}{RGB}{41,5,195}
+
+% --- Informações do PDF
+\makeatletter
+\hypersetup{
+		pdftitle={\@title}, 
+		pdfauthor={\@author},
+    	pdfsubject={Modelo de artigo científico com abnTeX2},
+		colorlinks=true,
+    	linkcolor=blue,
+    	citecolor=blue,
+    	filecolor=magenta,
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+
+\makeatother
+
+\makeindex
+
+% --- Alterar as margens padrões
+\setlrmarginsandblock{3cm}{3cm}{*}
+\setulmarginsandblock{3cm}{3cm}{*}
+\checkandfixthelayout
+
+
+% --- Espaçamentos entre linhas e parágrafos
+\setlength{\parindent}{1.3cm}
+\setlength{\parskip}{0.2cm}
+\SingleSpacing
+
+% --- Início do documento
+\begin{document}
+\frenchspacing
+
+\maketitle
+
+% --- Resumo
+\begin{resumo}
+
+Artigo cientifico sobre o uso de Views, Triggers, Procedimentos e Joins na linguagem SQL no trabalho, e manipulação, de bancos de dados relacionais.
+\vspace{\onelineskip}
+
+\noindent
+\end{resumo}
+
+\textual
+
+% --- Introdução
+\section{Introdução}
+
+\addcontentsline{toc}{section}{Introdução}
+
+A linguagem SQL (Struct Query Language, ou “Linguagem de Consulta Estruturada”) é uma linguagem padrão para a manipulação de dados dentro de um sistema de gerenciamento de banco de dados. \\
+Ela possibilita o armazenamento, organização, atualização e exclusão de informações dentro de um determinado banco de dados, e é uma linguagem declarativa e que não necessita de profundos conhecimentos de programação para que alguém possa começar a manipula-la. \\
+Neste artigo científico, sera explicado as definições, aplicações e exemplos práticos seguintes tópicos contidos na linguagem SQL: Views, Triggers, Procedimentos e Join (junções); além de ser explicados e analisados cenários em que esses tópicos podem, ou não, serem aplicados.
+
+% --- Tópico: Views
+\section{Views}
+
+\subsection{Definição}
+
+Em teoria de banco de dados, uma view é um conjunto resultado de uma consulta armazenada sobre os dados, as linhas e colunas da view são geradas dinamicamente no momento em que é feita uma referência a ela.
+
+\subsection{Para que serve}
+
+Uma view é uma maneira alternativa de observação de dados de uma ou mais tabelas, que compõem uma base de dados. Então ela pode ser considerada como uma tabela virtual (ou uma consulta armazenada). \\
+Sendo assim, as views nos possibilitam mais que simplesmente "visualizar dados", pois elas podem ser implementadas também com algumas aplicações de restrição
+
+\subsection{Para que deve ser aplicado}
+
+As views podem ser usadas em casos como: criar uma restrição entre os usuários e os dados, criar uma restrição entre os usuários e os domínios, associar vários domínios formando uma única entidade e agregar informações, em vez de fornecer maiores detalhes do banco de dados.
+
+\subsection{Locais onde não deve ser aplicado}
+
+Existem alguns locais que as views não devem ser aplicadas, elas escondem uma complexidade da query, podendo enganar o desenvolvedor quanto à performance necessária para acessar determinada informação especifica. \\
+Também pode ser mais complexo quando views usam outras views. Em alguns casos, o usuário pode estar fazendo consultas desnecessárias (sem saber disso) e de forma muito intensiva. \\
+As views também podem ser "mal utilizadas" criando camadas extras, e assim, mais objetos para serem administrados, em alguns casos, isso pode limitar exageradamente o que o usuário pode acessar impedindo certas tarefas. \\
+
+\subsection{Exemplos práticos}
+
+Um exemplo prático sobre um uso de uma view: abaixo vemos uma view criada para facilitar o acesso aos funcionários que são de Seattle.
+
+\begin{verbatim}
+    CREATE VIEW dbo.SeattleOnly
+    AS
+    SELECT p.LastName, p.FirstName, e.JobTitle, a.City, sp.StateProvinceCode
+    FROM HumanResources.Employee e
+    INNER JOIN Person.Person p
+    ON p.BusinessEntityID = e.BusinessEntityID
+        INNER JOIN Person.BusinessEntityAddress bea 
+        ON bea.BusinessEntityID = e.BusinessEntityID 
+        INNER JOIN Person.Address a 
+        ON a.AddressID = bea.AddressID
+        INNER JOIN Person.StateProvince sp 
+        ON sp.StateProvinceID = a.StateProvinceID
+    WHERE a.City = 'Seattle'
+\end{verbatim}
+
+Fazendo dessa forma, é possível acessar as informações mais importantes destes funcionários de forma consolidada em uma "tabela virtual" chamada SeattleOnly.
+
+% --- Tópico: Triggers
+\section{Triggers}
+
+\subsection{Definição}
+
+Os triggers (gatilhos) definem uma estrutura do banco de dados que funciona, como o nome sugere, como uma função que é disparada mediante alguma ação.
+Geralmente essas ações que disparam os triggers são alterações nas tabelas por meio de operações de inserção, exclusão e atualização de dados (insert, delete e update). \\
+Um gatilho está diretamente relacionado a uma tabela, sempre que uma dessas ações é efetuada sobre determinada tabela, é possível dispará-lo para executar alguma tarefa.
+
+\subsection{Para que serve}
+
+A principal funcionalidade de um trigger é a automatização de tarefas no banco de dados após ocorrer alguma ação.
+
+\subsection{Para que deve ser aplicado}
+
+A aplicação de triggers dependerá muito de como esta sendo desenvolvendo determinada aplicação. O melhor cenário seria quando é necessário tirar algumas funções de uma aplicação e colocá-las no banco de dados, por exemplo. \\
+Um exemplo seria o armazenamento de acessos à determinada aplicação, visto que o trigger dispara-rá uma função que vai registrar os dados do usuário visitante (como por exemplo: IP, data de acesso, entre outros dados) e criará um log de usuário, registrando no banco de dados. 
+
+\subsection{Locais onde não deve ser aplicado}
+
+Existem alguns cenários em que se deve analisar a necessidade de utilizar um trigger, ao adota-lo, resultará na quase impossibilidade de migração de banco de dados, visto que os triggers utilizam uma linguagem proprietária. \\
+É consenso também que a utilização de triggers acarreta em uma queda de perfmormance.
+
+\subsection{Exemplos práticos}
+
+Para exemplificar na prática o uso de triggers, será usado como cenário uma certa aplicação financeira que contém um controle de caixa e efetua vendas, simulando que já foram criadas as tabelas dessa aplicação e inseridos alguns registros nela. \\
+Pelo código abaixo, sempre que forem registradas ou excluídas vendas, essas operações devem ser automaticamente refletidas na tabela de caixa, aumentando ou reduzindo o saldo.
+
+\begin{verbatim}
+CREATE TRIGGER TGR_VENDAS_AI
+ON VENDAS
+FOR INSERT
+AS
+BEGIN
+    DECLARE
+    @VALOR  DECIMAL(10,2),
+    @DATA   DATETIME
+
+    SELECT @DATA = DATA, @VALOR = VALOR FROM INSERTED
+
+    UPDATE CAIXA SET SALDO_FINAL = SALDO_FINAL + @VALOR
+    WHERE DATA = @DATA
+END
+GO
+\end{verbatim}
+
+No exemplo acima, o trigger reflete diretamente sobre a tabela de vendas, que reduzirá o saldo final do caixa na data da venda quando uma venda for inserida.
+
+% --- Tópico: Procedimentos
+\section{Procedimentos}
+
+\subsection{Definição}
+
+
+\subsection{Para que serve}
+
+
+\subsection{Para que deve ser aplicado}
+
+
+\subsection{Locais onde não deve ser aplicado}
+
+
+\subsection{Exemplos práticos}
+
+% --- Tópico: Joins
+\section{Joins}
+
+\subsection{Definição}
+
+
+\subsection{Para que serve}
+
+
+\subsection{Para que deve ser aplicado}
+
+
+\subsection{Locais onde não deve ser aplicado}
+
+
+\subsection{Exemplos práticos}
+
+
+% --- Conclusão
+\section{Considerações finais}
+
+\addcontentsline{toc}{section}{Considerações finais}
+
+% --- Referências bibliográficas
+\vspace{\onelineskip}
+\bibliography{referencias}
+\nocite{o-que-e-sql}
+\nocite{guia-completo-sql}
+\nocite{beaulieu2019aprendendo}
+\nocite{conceito-views}
+\nocite{microsoft-create-view}
+\nocite{triggers-no-sql}
+\nocite{trigger-trybe}
+
+% --- Fim do documento
+\bookmarksetup{startatroot}
+
+\end{document}
