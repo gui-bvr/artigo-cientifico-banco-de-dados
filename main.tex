@@ -10,6 +10,7 @@
 \usepackage{color}
 \usepackage{graphicx}
 \usepackage{microtype}
+\usepackage{float}
 
 % --- Pacotes de citações
 \usepackage[brazilian,hyperpageref]{backref}
@@ -31,7 +32,7 @@
 
 % --- Capa e folha de rosto
 \titulo{Artigo científico sobre banco de dados}
-\autor{Guilherme Banzati Viana Ribeiro}
+\autor {Antonio Marcos Siqueira \\ Guilherme Banzati Viana Ribeiro}
 \local{Brasil}
 \data{24 de Junho de 2022}
 
@@ -236,9 +237,76 @@ Para excluir um procedimento, basta utilizar a cláusula "DROP PROCEDURE" como n
 
 \subsection{Definição}
 
+Joins são métodos de “Junção”, que tem a finalidade de unir duas tabelas do banco de dados.
 
 \subsection{Para que serve}
 
+Como o própio nome sugere, o método Join serve para juntar tabelas.
+Pode-se dizer que o método Join se retrata na Teoria dos Conjuntos, muito conhecida na matemática. \\
+Existem vários tipos de comandos "join", e cada um possui um efeito diferente em cima das tabelas selecionadas.
+
+\begin{figure}[H]
+\caption{Inner Join}
+\centering
+\includegraphics[width=5cm]{assets/innerJoin.jpg}
+\label{fig:innerJoin}
+\end{figure}
+
+O Inner Join é o método de junção mais conhecido, e como ilustra a Figura 1, retorna os registros que são comuns às duas tabelas.
+
+\begin{figure}[H]
+\caption{Left Join}
+\centering
+\includegraphics[width=5cm]{assets/leftJoin.jpg}
+\label{fig:leftJoin}
+\end{figure}
+
+O Left Join, como ilustra a Figura 2, retorna todos os registros que estão na tabela A (mesmo que não estejam na tabela B) e os registros da tabela B que são comuns à tabela A.
+
+\begin{figure}[H]
+\caption{Right Join}
+\centering
+\includegraphics[width=5cm]{assets/rightJoin.jpg}
+\label{fig:rightJoin}
+\end{figure}
+
+O Right Join, como ilustra a Figura 3, retorna todos os registros que estão na tabela B (mesmo que não estejam na tabela A) e os registros da tabela A que são comuns à tabela B.
+
+\begin{figure}[H]
+\caption{Outer Join}
+\centering
+\includegraphics[width=5cm]{assets/outerJoin.jpg}
+\label{fig:outerJoin}
+\end{figure}
+
+O Outer Join, como ilustra a Figura 4, retorna todos os registros que estão na tabela A e todos os registros da tabela B.
+
+\begin{figure}[H]
+\caption{Left Excluding Join}
+\centering
+\includegraphics[width=5cm]{assets/leftExcludingJoin.jpg}
+\label{fig:leftExcluidingJoin}
+\end{figure}
+
+O Left Excluding Join, como ilustra a figura 5, retorna todos os registros que estão na tabela A e que não estejam na tabela B.
+
+\begin{figure}[H]
+\caption{Right Excluding Join}
+\centering
+\includegraphics[width=5cm]{assets/rightExcludingJoin.jpg}
+\label{fig:rightExcluidingJoin}
+\end{figure}
+
+O Right Excluding Join, como ilustra a Figura 6, retorna todos os registros que estão na tabela B e que não estejam na tabela A.
+
+\begin{figure}[H]
+\caption{Outer Excluding Join}
+\centering
+\includegraphics[width=5cm]{assets/outerExcludingJoin.jpg}
+\label{fig:outerExcluidingJoin}
+\end{figure}
+
+O Outer Excluding Join, como ilustra a Figura 7, retorna todos os registros que estão na tabela B, mas que não estejam na tabela A, e todos os registros que estão na tabela A, mas que não estejam na tabela B.
 
 \subsection{Para que deve ser aplicado}
 
@@ -269,6 +337,8 @@ Assim sendo, se torna mais simples a codificação de um determinado sistema, de
 \nocite{trigger-trybe}
 \nocite{ibm-procedimentos}
 \nocite{introducao-procedimentos}
+\nocite{devmedia-joins}
+\nocite{devmedia-fulljoins}
 
 % --- Fim do documento
 \bookmarksetup{startatroot}
