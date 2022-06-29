@@ -310,19 +310,209 @@ O Outer Excluding Join, como ilustra a Figura 7, retorna todos os registros que 
 
 \subsection{Para que deve ser aplicado}
 
+Em resumo, os joins servem para qualquer tipo de junção de tabelas. Há diversos usos para a aplicação de joins, mas para isso, deve se saber utilizar o tipo adequado para um query, por exemplo, pois pode resultar em um retorno diferente do esperado, além de gerar até problemas de performance no banco de dados.
 
 \subsection{Locais onde não deve ser aplicado}
 
+Pode se resultar em um problema de performance a utilização do join onde não é necessário seu uso, pois basicamente ele é um mecanismo automático que pode buscar coisas que você o usuário precisa.
+Quanto mais há tabelas envolvidas, mais pode prejudicar a performance, até mesmo de forma exponencial. Na prática, quanto mais tabelas, mais combinações são possíveis, mais dados serão gerados, mais fontes a serem consultadas, e se resulta em menos oportunidades de otimizações.
 
 \subsection{Exemplos práticos}
 
+Abaixo será mostrado, em exemplos, o funcionamento e o retorno de cada join, em tabelas previamente montadas, que possuam algum relacionamento para que os dados possam ser "cruzados".
+Serão criadas duas tabelas contendo uma coluna Nome, que será comum entre elas.
 
+\begin{verbatim}
+    CREATE TABLE TabelaA(
+      Nome varchar(50) NULL
+    )
+    GO
+    CREATE TABLE TabelaB(
+      Nome varchar(50) NULL
+\end{verbatim}
 
+Em seguida, serão adicionados, nas tabelas recém criadas, alguns dados para que permitam colocar à prova as junções.
+
+\begin{verbatim}
+    INSERT INTO TabelaA VALUES('Fernanda')
+    INSERT INTO TabelaA VALUES('Josefa')
+    INSERT INTO TabelaA VALUES('Luiz')
+    INSERT INTO TabelaA VALUES('Fernando')
+    
+    INSERT INTO TabelaB VALUES('Carlos')
+    INSERT INTO TabelaB VALUES('Manuel')
+    INSERT INTO TabelaB VALUES('Luiz')
+    INSERT INTO TabelaB VALUES('Fernando')
+\end{verbatim}
+
+- Exemplo de junção com o comando Inner Join:
+
+\begin{verbatim}
+    SELECT a.Nome, b.Nome
+    FROM TabelaA as A
+    INNER JOIN TabelaB as B
+                    on a.Nome = b.Nome
+\end{verbatim}
+
+Resultado:
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Nome} & \textbf{Nome} \\ \hline
+Luiz          & NULL          \\ \hline
+Fernando      & NULL          \\ \hline
+\end{tabular}
+\end{table}
+
+- Exemplo de junção com o comando Left Join:
+
+\begin{verbatim}
+    SELECT a.Nome, b.Nome
+    FROM TabelaA as A
+    LEFT JOIN TabelaB as B
+      on a.Nome = b.Nome
+\end{verbatim}
+
+Resultado:
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Nome} & \textbf{Nome} \\ \hline
+Fernanda      & NULL          \\ \hline
+Josefa        & NULL          \\ \hline
+Luiz          & Luiz          \\ \hline
+Fernando      & Fernando      \\ \hline
+\end{tabular}
+\end{table}
+
+- Exemplo de junção com o comando Right Join:
+
+\begin{verbatim}
+    SELECT a.Nome, b.Nome
+    FROM TabelaA as A
+    RIGHT JOIN TabelaB as B
+      on a.Nome = b.Nome
+\end{verbatim}
+
+Resultado:
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Nome} & \textbf{Nome} \\ \hline
+NULL          & Carlos        \\ \hline
+NULL          & Manuel        \\ \hline
+Luiz          & Luiz          \\ \hline
+Fernando      & Fernando      \\ \hline
+\end{tabular}
+\end{table}
+
+- Exemplo de junção com o comando Outer Join:
+
+\begin{verbatim}
+    SELECT a.Nome, b.Nome
+    FROM TabelaA as A
+    FULL OUTER JOIN TabelaB as B
+        on a.Nome = b.Nome
+\end{verbatim}
+
+Resultado:
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Nome} & \textbf{Nome} \\ \hline
+Fernanda      & NULL          \\ \hline
+Josefa        & NULL          \\ \hline
+Luiz          & Luiz          \\ \hline
+Fernando      & Fernando      \\ \hline
+NULL          & Carlos        \\ \hline
+NULL          & Manuel        \\ \hline
+\end{tabular}
+\end{table}
+
+*Observação: nesse código, a palavra reservada OUTER é opcional. Portanto, se a removermos, deixando apenas a expressão FULL JOIN, o resultado será o mesmo.
+
+\vspace{\onelineskip}
+
+- Exemplo de junção com o comando Left Excluding Join:
+
+\begin{verbatim}
+    SELECT a.Nome, b.Nome
+    FROM TabelaA as A
+    LEFT JOIN TabelaB as B
+                    on a.Nome = b.Nome
+    WHERE b.Nome is null
+\end{verbatim}
+
+Resultado:
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Nome} & \textbf{Nome} \\ \hline
+Fernanda      & NULL          \\ \hline
+Josefa        & NULL          \\ \hline
+\end{tabular}
+\end{table}
+
+- Exemplo de junção com o comando Right Excluding Join:
+
+\begin{verbatim}
+    SELECT a.Nome, b.Nome
+    FROM TabelaA as A
+    RIGHT JOIN TabelaB as B
+        on a.Nome = b.Nome
+    WHERE a.Nome is null
+\end{verbatim}
+
+Resultado:
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Nome} & \textbf{Nome} \\ \hline
+NULL          & Carlos        \\ \hline
+NULL          & Manuel        \\ \hline
+\end{tabular}
+\end{table}
+
+- Exemplo de junção com o comando Outer Excluding Join:
+
+\begin{verbatim}
+    SELECT a.Nome, b.Nome
+    FROM TabelaA as A
+    FULL OUTER JOIN TabelaB as B
+        on a.Nome = b.Nome
+    WHERE a.Nome is null or b.Nome is null
+\end{verbatim}
+
+Resultado:
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Nome} & \textbf{Nome} \\ \hline
+Fernanda      & NULL          \\ \hline
+Josefa        & NULL          \\ \hline
+NULL          & Carlos        \\ \hline
+NULL          & Manuel        \\ \hline
+\end{tabular}
+\end{table}
 
 % --- Conclusão
 \section{Considerações finais}
 
-Como visto nesse artigo científico, as aplicações de views, triggers, procedimentos e joins são recursos importantes a serem implementados em um banco de dados, pois eles simplificam diversas operações a serem realizadas por ele, \\
+Como visto nesse artigo científico, as aplicações de views, triggers, procedimentos e joins são recursos importantes a serem implementados em um banco de dados, pois eles simplificam diversas operações a serem realizadas por ele.
 Assim sendo, se torna mais simples a codificação de um determinado sistema, definindo uma camada intermediária de controle entre o usuário, o banco de dados físico e o código fonte da aplicação.
 
 % --- Referências bibliográficas
@@ -339,6 +529,7 @@ Assim sendo, se torna mais simples a codificação de um determinado sistema, de
 \nocite{introducao-procedimentos}
 \nocite{devmedia-joins}
 \nocite{devmedia-fulljoins}
+\nocite{trybe-join}
 
 % --- Fim do documento
 \bookmarksetup{startatroot}
