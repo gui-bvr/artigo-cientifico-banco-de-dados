@@ -104,7 +104,7 @@ Em teoria de banco de dados, uma view é um conjunto resultado de uma consulta a
 \subsection{Para que serve}
 
 Uma view é uma maneira alternativa de observação de dados de uma ou mais tabelas, que compõem uma base de dados. Então ela pode ser considerada como uma tabela virtual (ou uma consulta armazenada). \\
-Sendo assim, as views nos possibilitam mais que simplesmente "visualizar dados", pois elas podem ser implementadas também com algumas aplicações de restrição
+Sendo assim, as views nos possibilitam mais que simplesmente ''visualizar dados'', pois elas podem ser implementadas também com algumas aplicações de restrição
 
 \subsection{Para que deve ser aplicado}
 
@@ -114,29 +114,25 @@ As views podem ser usadas em casos como: criar uma restrição entre os usuário
 
 Existem alguns locais que as views não devem ser aplicadas, elas escondem uma complexidade da query, podendo enganar o desenvolvedor quanto à performance necessária para acessar determinada informação especifica. \\
 Também pode ser mais complexo quando views usam outras views. Em alguns casos, o usuário pode estar fazendo consultas desnecessárias (sem saber disso) e de forma muito intensiva. \\
-As views também podem ser "mal utilizadas" criando camadas extras, e assim, mais objetos para serem administrados, em alguns casos, isso pode limitar exageradamente o que o usuário pode acessar impedindo certas tarefas. \\
+As views também podem ser ''mal utilizadas'' criando camadas extras, e assim, mais objetos para serem administrados, em alguns casos, isso pode limitar exageradamente o que o usuário pode acessar impedindo certas tarefas. \\
 
 \subsection{Exemplos práticos}
 
-Um exemplo prático sobre um uso de uma view: abaixo vemos uma view criada para facilitar o acesso aos funcionários que são de Seattle.
+Um exemplo prático sobre um uso de uma view: abaixo vemos uma view criada para facilitar o acesso de vendas e produtos de um determinado banco de dados.
 
 \begin{verbatim}
-    CREATE VIEW dbo.SeattleOnly
-    AS
-    SELECT p.LastName, p.FirstName, e.JobTitle, a.City, sp.StateProvinceCode
-    FROM HumanResources.Employee e
-    INNER JOIN Person.Person p
-    ON p.BusinessEntityID = e.BusinessEntityID
-        INNER JOIN Person.BusinessEntityAddress bea 
-        ON bea.BusinessEntityID = e.BusinessEntityID 
-        INNER JOIN Person.Address a 
-        ON a.AddressID = bea.AddressID
-        INNER JOIN Person.StateProvince sp 
-        ON sp.StateProvinceID = a.StateProvinceID
-    WHERE a.City = 'Seattle'
+    CREATE VIEW vwVendas AS
+    SELECT * FROM Vendas V
+    JOIN Clientes C ON V.Cliente_id = C.id_Cliente
+    JOIN Produtos P ON V.Produto_id = P.id_Produto
+    GO
 \end{verbatim}
 
-Fazendo dessa forma, é possível acessar as informações mais importantes destes funcionários de forma consolidada em uma tabela chamada SeattleOnly.
+A view criada no exemplo anterior pode ser executada da seguinte forma
+
+\begin{verbatim}
+    SELECT * FROM vwVendas
+\end{verbatim}
 
 % --- Tópico: Triggers
 \section{Triggers}
@@ -163,7 +159,29 @@ Existem alguns cenários em que se deve analisar a necessidade de utilizar um tr
 
 \subsection{Exemplos práticos}
 
-Para exemplificar na prática o uso de triggers, será usado como cenário uma certa aplicação financeira que contém um controle de caixa e efetua vendas, simulando que já foram criadas as tabelas dessa aplicação e inseridos alguns registros nela. \\
+Para exemplificar na prática o uso de triggers, será usado como cenário uma certa aplicação financeira que contém um controle de caixa e efetua vendas.
+Abaixo, serão criadas as tabelas para usar de exemplo.
+
+\begin{verbatim}
+    CREATE TABLE CAIXA
+    (
+        DATA            DATETIME,
+        SALDO_INICIAL   DECIMAL(10,2),
+        SALDO_FINAL     DECIMAL(10,2)
+    )
+    GO
+    INSERT INTO CAIXA
+    VALUES (CONVERT(DATETIME, CONVERT(VARCHAR, GETDATE(), 103)), 100, 100)
+    GO
+    CREATE TABLE VENDAS
+    (
+        DATA    DATETIME,
+        CODIGO  INT,
+        VALOR   DECIMAL(10,2)
+    )
+    GO
+\end{verbatim}
+
 Pelo código abaixo, sempre que forem registradas ou excluídas vendas, essas operações devem ser automaticamente refletidas na tabela de caixa, aumentando ou reduzindo o saldo.
 
 \begin{verbatim}
@@ -182,7 +200,17 @@ Pelo código abaixo, sempre que forem registradas ou excluídas vendas, essas op
     GO
 \end{verbatim}
 
-No exemplo acima, o trigger reflete diretamente sobre a tabela de vendas, que reduzirá o saldo final do caixa na data da venda quando uma venda for inserida.
+No exemplo acima, o trigger reflete diretamente sobre a tabela de vendas, que reduzirá o saldo final do caixa na data da venda quando uma venda for inserida. \\
+O resultado será mostrado na tabela abaixo:
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{DATA}           & \textbf{SALDO\_INICIAL} & \textbf{SALDO\_FINAL} \\ \hline
+2022-06-29 00:00:00.000 & 100.00                  & 100.00                \\ \hline
+\end{tabular}
+\end{table}
 
 % --- Tópico: Procedimentos
 \section{Procedimentos}
@@ -220,13 +248,13 @@ No exemplo abaixo, é executado uma consulta utilizando um filtro por descriçã
     WHERE Descricao = @CampoBusca
 \end{verbatim}
 
-Para executar esse procedimento, basta declarar "EXECUTE" seguido pelo nome dele, e na frente o valor a ser utilizado como parâmetro.
+Para executar esse procedimento, basta declarar ''EXECUTE'' seguido pelo nome dele, e na frente o valor a ser utilizado como parâmetro.
 
 \begin{verbatim}
     EXECUTE Busca 'Exemplo'
 \end{verbatim}
 
-Para excluir um procedimento, basta utilizar a cláusula "DROP PROCEDURE" como no exemplo abaixo.
+Para excluir um procedimento, basta utilizar a cláusula ''DROP PROCEDURE'' como no exemplo abaixo.
 
 \begin{verbatim}
     DROP PROCEDURE Busca
@@ -243,7 +271,7 @@ Joins são métodos de “Junção”, que tem a finalidade de unir duas tabelas
 
 Como o própio nome sugere, o método Join serve para juntar tabelas.
 Pode-se dizer que o método Join se retrata na Teoria dos Conjuntos, muito conhecida na matemática. \\
-Existem vários tipos de comandos "join", e cada um possui um efeito diferente em cima das tabelas selecionadas.
+Existem vários tipos de comandos ''join'', e cada um possui um efeito diferente em cima das tabelas selecionadas.
 
 \begin{figure}[H]
 \caption{Inner Join}
@@ -319,7 +347,7 @@ Quanto mais há tabelas envolvidas, mais pode prejudicar a performance, até mes
 
 \subsection{Exemplos práticos}
 
-Abaixo será mostrado, em exemplos, o funcionamento e o retorno de cada join, em tabelas previamente montadas, que possuam algum relacionamento para que os dados possam ser "cruzados".
+Abaixo será mostrado, em exemplos, o funcionamento e o retorno de cada join, em tabelas previamente montadas, que possuam algum relacionamento para que os dados possam ser ''cruzados''.
 Serão criadas duas tabelas contendo uma coluna Nome, que será comum entre elas.
 
 \begin{verbatim}
